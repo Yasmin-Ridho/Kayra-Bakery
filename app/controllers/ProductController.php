@@ -138,8 +138,7 @@ class ProductController extends Controller
             'description' => 'required|min:10',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|numeric|min:0',
-            'category_id' => 'required|numeric',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max_size:2048'
+            'category_id' => 'required|numeric'
         ], [
             'name.required' => 'Nama produk wajib diisi.',
             'name.min' => 'Nama produk minimal 3 karakter.',
@@ -157,12 +156,25 @@ class ProductController extends Controller
             'stock.numeric' => 'Stok produk harus berupa angka.',
             'stock.min' => 'Stok produk tidak boleh negatif.',
             'category_id.required' => 'Kategori produk wajib dipilih.',
-            'category_id.numeric' => 'Kategori produk tidak valid.',
-            'image.required' => 'Gambar produk wajib diisi.',
-            'image.image' => 'Gambar produk harus berupa gambar.',
-            'image.mimes' => 'Gambar produk harus berupa file jpeg, png, jpg, gif, atau webp.',
-            'image.max_size' => 'Gambar produk maksimal 2MB'
+            'category_id.numeric' => 'Kategori produk tidak valid.'
         ]);
+
+        // Validasi file upload secara terpisah
+        if (!hasFile('image')) {
+            setValidationError('image', 'Gambar produk wajib diisi.');
+            redirect(url('products/create'));
+            return;
+        }
+
+        // Validasi tipe dan ukuran file
+        if (!validateUploadedFile('image', [
+            'mimes' => 'jpeg,jpg,png,gif,webp',
+            'max_size' => 2048 // 2MB
+        ])) {
+            setValidationError('image', 'File harus berupa gambar (jpeg, jpg, png, gif, webp) dengan ukuran maksimal 2MB.');
+            redirect(url('products/create'));
+            return;
+        }
 
         if (!$isValid) {
             redirect(url('products/create'));
@@ -182,22 +194,20 @@ class ProductController extends Controller
         try {
             $product = Product::create($productData);
             
-            // Handle image upload jika ada
-            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                $uploadResult = $product->uploadImage($_FILES['image']);
-                
-                if (!$uploadResult['success']) {
-                    setFlashMessage('warning', 'Produk berhasil ditambahkan, tapi gagal mengupload gambar: ' . $uploadResult['message']);
-                    redirect(url('products'));
-                    return;
-                }
+            // Handle image upload
+            $uploadResult = $product->uploadImage(getUploadedFile('image'));
+            
+            if (!$uploadResult['success']) {
+                setFlashMessage('warning', 'Produk berhasil ditambahkan, tapi gagal mengupload gambar: ' . $uploadResult['message']);
+                redirect(url('products'));
+                return;
             }
             
             // Clear old input setelah berhasil
             Request::clearOld();
             
             setFlashMessage('success', 'Produk berhasil ditambahkan!');
-            redirect(url('products'));
+            redirect(url('products/admin'));
         } catch (Exception $e) {
             setFlashMessage('error', 'Gagal menambahkan produk: ' . $e->getMessage());
             redirect(url('products/create'));
@@ -411,7 +421,7 @@ class ProductController extends Controller
             setFlashMessage('error', 'Gagal menghapus produk: ' . $e->getMessage());
         }
 
-        redirect(url('products'));
+        redirect(url('products/admin'));
     }
 }
 

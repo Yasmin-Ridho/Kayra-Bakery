@@ -19,6 +19,13 @@ class CartController extends Controller
      */
     public function index()
     {
+        // check if user is not admin
+        if (getCurrentUser()['role'] != 'user') {
+            setFlashMessage('error', 'Anda tidak memiliki akses ke halaman ini.');
+            redirect(getBaseUrl() . '/dashboard');
+            return;
+        }
+
         // Check authentication
         if (!isLoggedIn()) {
             setFlashMessage('error', 'Anda harus login terlebih dahulu.');

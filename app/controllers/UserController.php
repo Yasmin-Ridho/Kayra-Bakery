@@ -2,6 +2,7 @@
 
 require_once 'core/Controller.php';
 require_once 'app/models/User.php';
+require_once 'app/models/Transaction.php';
 
 class UserController extends Controller
 {
@@ -241,6 +242,14 @@ class UserController extends Controller
         // Check if user is admin
         if (getCurrentUser()['role'] != 'admin') {
             setFlashMessage('error', 'Anda tidak memiliki akses ke halaman ini.');
+            redirect(url('users'));
+            return;
+        }
+
+        // check if user has no transaction
+        $transactions = Transaction::where('user_id', $id);
+        if (count($transactions) > 0) {
+            setFlashMessage('error', 'User tidak dapat dihapus karena memiliki transaksi.');
             redirect(url('users'));
             return;
         }

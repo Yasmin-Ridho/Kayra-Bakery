@@ -11,6 +11,13 @@ class TransactionController extends Controller
      */
     public function show($id)
     {
+        // check if user is not admin
+        if (getCurrentUser()['role'] != 'user') {
+            setFlashMessage('error', 'Anda tidak memiliki akses ke halaman ini.');
+            redirect(getBaseUrl() . '/orders');
+            return;
+        }
+
         // Check if user is logged in
         if (!isLoggedIn()) {
             setFlashMessage('error', 'Anda harus login terlebih dahulu.');
