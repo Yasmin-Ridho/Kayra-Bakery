@@ -333,6 +333,7 @@ ob_start();
                             </div>
                         <?php endif; ?>
                         
+                        <?php if ($_SESSION['user_role'] != 'admin') { ?>
                         <!-- Enhanced Status Info -->
                         <div class="mb-8 p-6 rounded-2xl border-2 border-dashed border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100">
                             <h4 class="text-base font-bold text-gray-800 mb-4 flex items-center">
@@ -363,7 +364,9 @@ ob_start();
                                 </div>
                             </div>
                         </div>
-                        
+                        <?php }  ?>
+
+
                         <!-- Enhanced Order Summary -->
                         <div class="space-y-4 mb-8">
                             <div class="flex justify-between items-center p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200">
@@ -383,6 +386,7 @@ ob_start();
                             </div>
                         </div>
                         
+                        <?php if ($_SESSION['user_role'] != 'admin') { ?>
                         <!-- Enhanced Action Buttons -->
                         <div class="space-y-4">
                             <a href="<?= $baseUrl ?>/orders/my-order" 
@@ -392,7 +396,7 @@ ob_start();
                                 </svg>
                                 Lihat Semua Transaksi
                             </a>
-                            
+
                             <a href="<?= $baseUrl ?>/products" 
                                class="block w-full text-center border-2 border-gray-300 text-gray-700 py-4 px-6 rounded-2xl font-bold hover:bg-gray-50 hover:border-soft-pink-300 hover:text-soft-pink-600 transition-all duration-300">
                                 <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -401,6 +405,7 @@ ob_start();
                                 Belanja Lagi
                             </a>
                         </div>
+                        <?php }  ?>
                         
                         <!-- Enhanced Contact Info -->
                         <div class="mt-8 pt-8 border-t border-gray-200">
@@ -516,14 +521,18 @@ ob_start();
 ::-webkit-scrollbar {
     width: 10px;
 }
-
+#F08080
 ::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background:rgb(250, 107, 219);
     border-radius: 6px;
 }
 
+body.admin-view {
+    background-color: #F08080 !important;
+}
+
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, #f472b6, #ec4899);
+    background: linear-gradient(to bottom,rgb(240, 143, 193), #ec4899);
     border-radius: 6px;
 }
 
@@ -549,6 +558,14 @@ ob_start();
     backdrop-filter: blur(4px);
 }
 </style>
+
+<?php if ($_SESSION['user_role'] == 'admin'): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.classList.add('admin-view');
+        });
+    </script>
+<?php endif; ?>
 
 <script>
 // Enhanced image modal functionality
